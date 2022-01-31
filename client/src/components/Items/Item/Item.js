@@ -12,6 +12,7 @@ import { deleteItem, saveItem } from '../../../actions/items';
 const Item = ({ item, setCurrentId }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem('profile'));
 
   const saved = item.isSaved ? <strong>Saved</strong> : <div>Save</div>;
   const savedIcon = item.isSaved ? (
@@ -25,15 +26,17 @@ const Item = ({ item, setCurrentId }) => {
       <CardMedia className={classes.media} image={item.selectedFile} name={item.name} />
 
       <div className={classes.overlay}>
-        <Typography variant="h6">{item.owner}</Typography>
+        <Typography variant="h6">{item.userName}</Typography>
         <Typography variant="body2">{moment(item.createdAt).fromNow()}</Typography>
       </div>
 
-      <div className={classes.overlay2}>
-        <Button style={{ color: 'white' }} size="small" onClick={() => setCurrentId(item._id)}>
-          <MoreHoriz fontSize="default"></MoreHoriz>
-        </Button>
-      </div>
+      {(user?.result?.googleId === item?.owner || user?.result?._id === item?.owner) && (
+        <div className={classes.overlay2}>
+          <Button style={{ color: 'white' }} size="small" onClick={() => setCurrentId(item._id)}>
+            <MoreHoriz fontSize="default"></MoreHoriz>
+          </Button>
+        </div>
+      )}
 
       <div className={classes.details}>
         <Typography variant="body2" color="textSecondary">
@@ -58,15 +61,21 @@ const Item = ({ item, setCurrentId }) => {
       </CardContent>
 
       <CardActions className={classes.cardActions}>
-        <Button size="small" color="primary" onClick={() => dispatch(saveItem(item._id))}>
+        <Button
+          size="small"
+          color="primary"
+          disabled={!user?.result}
+          onClick={() => dispatch(saveItem(item._id))}
+        >
           {savedIcon}
           {saved}
         </Button>
-
-        <Button size="small" color="secondary" onClick={() => dispatch(deleteItem(item._id))}>
-          <DeleteIcon fontSize="small" />
-          Delete
-        </Button>
+        {(user?.result?.googleId === item?.owner || user?.result?._id === item?.owner) && (
+          <Button size="small" color="secondary" onClick={() => dispatch(deleteItem(item._id))}>
+            <DeleteIcon fontSize="small" />
+            Delete
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

@@ -9,7 +9,6 @@ const Items = ({ setCurrentId }) => {
   const items = useSelector((state) => state.items); // why '.items'? Named in reducers index
   const classes = useStyles();
 
-  console.log(items);
   return !items.length ? (
     <CircularProgress />
   ) : (
