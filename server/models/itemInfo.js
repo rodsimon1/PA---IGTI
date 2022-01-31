@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const itemSchema = mongoose.Schema({
   name: String,
   description: String,
+  userName: String,
   owner: String,
   phoneNumber: String,
   tags: [String],

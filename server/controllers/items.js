@@ -14,7 +14,11 @@ export const getItems = async (req, res) => {
 
 export const createItem = async (req, res) => {
   const item = req.body;
-  const newItem = new ItemInfo(item);
+  const newItem = new ItemInfo({
+    ...item,
+    owner: req.userId,
+    createdAt: new Date().toISOString(),
+  });
 
   try {
     await newItem.save();
@@ -51,10 +55,24 @@ export const deleteItem = async (req, res) => {
 export const saveItem = async (req, res) => {
   const { id } = req.params;
 
+  // req.userId comes from middleware, so we have access to it here
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
+
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send("There's no item with that Id");
 
   const item = await ItemInfo.findById(id);
+
+  // const index = item.isSaved.findIndex((id) => id === String(req.userId));
+
+  // if (index === -1) {
+  //   // save the item - 1:55 on pt 3
+  //   item.isSaved.push(req.userId);
+  // } else {
+  //   // unsave the item
+  //   item.isSaved = item.isSaved.filter((id) => id !== String(req.userId));
+  // }
+
   const updatedItem = await ItemInfo.findByIdAndUpdate(
     id,
     { isSaved: !item.isSaved },

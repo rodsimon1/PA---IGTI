@@ -9,7 +9,6 @@ const Form = ({ currentId, setCurrentId }) => {
   const [itemData, setItemData] = useState({
     name: '',
     description: '',
-    owner: '',
     phoneNumber: '',
     tags: '',
     selectedFile: '',
@@ -19,6 +18,7 @@ const Form = ({ currentId, setCurrentId }) => {
   );
   const classes = useStyles();
   const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem('profile'));
 
   useEffect(() => {
     if (item) setItemData(item);
@@ -27,27 +27,38 @@ const Form = ({ currentId, setCurrentId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (currentId) {
-      dispatch(updateItem(currentId, itemData));
-      console.log(itemData);
+    if (currentId === 0) {
+      dispatch(createItem({ ...itemData, userName: user?.result?.name }));
+      console.log('user result', user?.result);
+      console.log('itemData', itemData);
+      clear();
     } else {
-      dispatch(createItem(itemData));
-      console.log(itemData);
+      dispatch(updateItem(currentId, { ...itemData, userName: user?.result?.name }));
+      console.log('itemdata', itemData);
+      clear();
     }
-    clear();
   };
 
   const clear = () => {
-    setCurrentId(null);
+    setCurrentId(0);
     setItemData({
       name: '',
       description: '',
-      owner: '',
       phoneNumber: '',
       tags: '',
       selectedFile: '',
     });
   };
+
+  if (!user?.result?.name) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="h6" align="center">
+          Please Sign In to list an item or save other's items
+        </Typography>
+      </Paper>
+    );
+  }
 
   return (
     <Paper className={classes.paper}>
@@ -62,7 +73,7 @@ const Form = ({ currentId, setCurrentId }) => {
         <TextField
           name="name"
           variant="outlined"
-          label="Name"
+          label="Item Name"
           fullWidth
           value={itemData.name}
           onChange={(e) => setItemData({ ...itemData, name: e.target.value })}
@@ -70,19 +81,12 @@ const Form = ({ currentId, setCurrentId }) => {
         <TextField
           name="description"
           variant="outlined"
-          label="Description"
+          label=" Description"
           fullWidth
           value={itemData.description}
           onChange={(e) => setItemData({ ...itemData, description: e.target.value })}
         />
-        <TextField
-          name="owner"
-          variant="outlined"
-          label="Owner"
-          fullWidth
-          value={itemData.owner}
-          onChange={(e) => setItemData({ ...itemData, owner: e.target.value })}
-        />
+
         <TextField
           name="phoneNumber"
           variant="outlined"

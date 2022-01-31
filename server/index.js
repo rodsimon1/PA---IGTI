@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 import itemsRoutes from './routes/items.js';
+import userRoutes from './routes/users.js';
 
 const app = express();
 dotenv.config();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 app.use(cors());
 
 app.use('/items', itemsRoutes);
+app.use('/user', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('Olá para o API do Projeto Aplicado IGTI de Rodrigo');
